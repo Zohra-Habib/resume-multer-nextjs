@@ -1,69 +1,211 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  const [form, setForm] = useState({
+    name: "",
+    jobTitle: "",
+    email: "",
+    phone: "",
+    location: "",
+    about: "",
+    education: "",
+    skills: "",
+    experience: "",
+  });
+
+  const [image, setImage] = useState(null);
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    Object.keys(form).forEach((key) => {
+      formData.append(key, form[key]);
+    });
+
+    formData.append("image", image);
+
+    const response = await fetch("/api/resume", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("resume", JSON.stringify(data.resume));
+      router.push("/resume");
+    } else {
+      alert(data.message);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
+    <main className="min-h-screen bg-slate-100 px-4 py-10">
+      <div className="mx-auto max-w-4xl">
+
+        <div className="mb-8 text-center">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-blue-600">
+            Professional Resume Builder
+          </p>
+
+          <h1 className="text-4xl font-bold text-slate-900">
+            Create Your Resume
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="mx-auto mt-3 max-w-xl text-slate-500">
+            Enter your details below and create a clean professional resume.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="rounded-2xl bg-white p-6 shadow-xl sm:p-10">
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+
+            <section>
+              <h2 className="mb-4 border-b pb-3 text-xl font-bold text-slate-800">
+                Personal Information
+              </h2>
+
+              <div className="grid gap-4 md:grid-cols-2">
+
+                <input
+                  name="name"
+                  placeholder="Full Name"
+                  onChange={handleChange}
+                  className="rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <input
+                  name="jobTitle"
+                  placeholder="Job Title"
+                  onChange={handleChange}
+                  className="rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email Address"
+                  onChange={handleChange}
+                  className="rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <input
+                  name="phone"
+                  placeholder="Phone Number"
+                  onChange={handleChange}
+                  className="rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <input
+                  name="location"
+                  placeholder="Location"
+                  onChange={handleChange}
+                  className="rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 md:col-span-2"
+                  required
+                />
+
+              </div>
+            </section>
+
+            <section>
+              <h2 className="mb-4 border-b pb-3 text-xl font-bold text-slate-800">
+                Professional Details
+              </h2>
+
+              <div className="space-y-4">
+
+                <textarea
+                  name="about"
+                  placeholder="Professional Summary / About Me"
+                  onChange={handleChange}
+                  rows="4"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <textarea
+                  name="education"
+                  placeholder="Education"
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <textarea
+                  name="skills"
+                  placeholder="Skills (HTML, CSS, JavaScript, React...)"
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                  required
+                />
+
+                <textarea
+                  name="experience"
+                  placeholder="Job Experience"
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                />
+
+              </div>
+            </section>
+
+            <section>
+              <h2 className="mb-4 border-b pb-3 text-xl font-bold text-slate-800">
+                Profile Photo
+              </h2>
+
+              <div className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-6">
+                <label className="mb-2 block font-medium text-slate-700">
+                  Upload your image
+                </label>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  required
+                  className="w-full text-sm text-slate-600"
+                />
+
+                <p className="mt-2 text-sm text-slate-400">
+                  JPG, PNG or WebP image recommended
+                </p>
+              </div>
+            </section>
+
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-blue-600 px-6 py-3.5 font-semibold text-white transition hover:bg-blue-700"
+            >
+              Create My Resume
+            </button>
+
+          </form>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
+
